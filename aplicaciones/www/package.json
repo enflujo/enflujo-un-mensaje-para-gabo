@@ -1,0 +1,15 @@
+{
+  "name": "www",
+  "type": "module",
+  "scripts": {
+    "ver": "vite --host",
+    "armar": "tsc && vite build"
+  },
+  "devDependencies": {
+    "autoprefixer": "^10.4.21",
+    "cssnano": "^7.0.6",
+    "postcss": "^8.5.3",
+    "sass": "^1.86.3",
+    "vite": "^6.3.1"
+  }
+}

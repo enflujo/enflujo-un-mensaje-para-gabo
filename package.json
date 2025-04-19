@@ -1,0 +1,27 @@
+{
+  "name": "enflujo-un-mensaje-para-gabo",
+  "packageManager": "yarn@4.6.0",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Un mensaje para Gabo",
+  "author": {
+    "name": "Juan Camilo González | Laboratorio EnFlujo",
+    "email": "j.gonzalezj@uniandes.edu.do"
+  },
+  "license": "MIT",
+  "workspaces": [
+    "aplicaciones/*"
+  ],
+  "scripts": {
+    "ver": "concurrently \"yarn workspace www ver\" \"yarn workspace servidor ver\"",
+    "armar": "concurrently \"yarn workspace www armar\" \"yarn workspace servidor armar\"",
+    "prender": "yarn workspace servidor prender",
+    "lint": "prettier --check .",
+    "lint:fix": "prettier --write --list-different ."
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.2",
+    "prettier": "^3.5.3",
+    "typescript": "^5.8.3"
+  }
+}
