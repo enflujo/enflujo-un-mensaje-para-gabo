@@ -3,7 +3,8 @@ import { defineConfig } from 'vite';
 export default defineConfig({
   // base: '/',
   server: {
-    port: 3000,
+    port: 4000,
+    allowedHosts: ['.enflujo.com'],
   },
   site: 'https://unmensajeparagabo.enflujo.com',
   publicDir: 'estaticos',

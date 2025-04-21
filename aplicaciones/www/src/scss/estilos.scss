@@ -31,18 +31,7 @@ body {
 body {
   min-height: 100vh;
   background: linear-gradient(to right, var(--baseClaro), var(--baseOscuro));
-}
-
-.space-mono-regular {
-  font-family: 'Space Mono', monospace;
-  font-weight: 400;
-  font-style: normal;
-}
-
-.space-mono-bold {
-  font-family: 'Space Mono', monospace;
-  font-weight: 700;
-  font-style: normal;
+  font-family: 'Space Mono', 'Courier New', 'Lucida Console', Monaco, monospace;
 }
 
 h1,
@@ -99,12 +88,15 @@ h1 {
   }
 }
 
+#formulario {
+  display: flex;
+}
+
 #mensaje {
-  font-family: 'Space Mono', 'Courier New', 'Lucida Console', Monaco, monospace;
   font-weight: 400;
   font-style: normal;
-  width: 100%;
-  height: calc(100vh - 54px);
+  width: calc(100vw - 100px);
+  height: calc(100vh - 50px);
   padding: 1rem;
   resize: none;
   border: none;
@@ -121,8 +113,42 @@ h1 {
 }
 
 #infoFormulario {
-  position: fixed;
-  bottom: 0;
+  position: relative;
+  top: 0;
+  right: 0;
+  width: 80px;
+  height: 70dvh;
+}
+
+#contador {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-220%);
+  right: -10px;
+  font-size: 0.8em;
+  width: 100%;
+  font-weight: 700;
+}
+
+#enviar {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  border: none;
+  background-color: var(--baseClaro);
+  color: white;
+  font-family: 'Space Mono', 'Courier New', 'Lucida Console', Monaco, monospace;
+  font-weight: 700;
+  letter-spacing: 2px;
+  line-height: 1em;
+  padding: 0.5em;
+  text-align: left;
+  cursor: pointer;
+
+  &:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
 }
 
 #estigia {

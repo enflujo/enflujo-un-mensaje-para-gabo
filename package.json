@@ -15,7 +15,10 @@
   "scripts": {
     "ver": "concurrently \"yarn workspace www ver\" \"yarn workspace servidor ver\"",
     "armar": "concurrently \"yarn workspace www armar\" \"yarn workspace servidor armar\"",
-    "prender": "yarn workspace servidor prender",
+    "prender": "yarn armar && pm2 start ecosystem.config.js",
+    "actualizar": "yarn armar && pm2 reload ecosystem.config.js",
+    "apagar": "pm2 stop ecosystem.config.js",
+    "reiniciar": "pm2 restart ecosystem.config.js",
     "lint": "prettier --check .",
     "lint:fix": "prettier --write --list-different ."
   },

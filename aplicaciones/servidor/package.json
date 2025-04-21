@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "scripts": {
     "ver": "nodemon ./fuente/hades.ts",
-    "armar": "esbuild ./fuente/hades.ts --bundle --minify --platform=node --outfile=publico/hades.js",
+    "armar": "esbuild ./fuente/hades.ts --bundle --minify --platform=node --external:better-sqlite3 --outfile=publico/hades.js",
     "prender": "node publico/hades.js"
   },
   "devDependencies": {

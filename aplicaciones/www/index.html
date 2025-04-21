@@ -6,18 +6,17 @@
     <link rel="icon" href="/favicon.ico" sizes="any" />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
-    <link rel="manifest" href="/sitio.webmanifest" />
-    <!-- <link rel="canonical" href="https://enflujo.com" /> -->
+    <link rel="canonical" href="https://unmensajeparagabo.enflujo.com" />
 
     <title>..:: Un mensaje para Gabo | EnFlujo ::..</title>
     <!-- <meta name="description" content="Descripción del sitio...." /> -->
 
     <!-- OpenGraph -->
     <meta property="og:locale" content="es_CO" />
-    <!-- <meta property="og:site_name" content="EnFlujo" /> -->
+    <meta property="og:site_name" content="Un mensaje para Gabo" />
     <meta property="og:type" content="website" />
-    <!-- <meta property="og:url" content="https://enflujo.com" /> -->
-    <!-- <meta property="og:title" content="Titulo ..." /> -->
+    <meta property="og:url" content="https://unmensajeparagabo.enflujo.com" />
+    <meta property="og:title" content="Un mensaje para Gabo" />
     <!-- <meta property="og:description" content="Descripción ..." /> -->
     <!-- <meta property="og:image" content="https://xxxxxx.jpg" /> -->
     <!-- <meta property="og:image:alt" content="Texto que describe la imagen" /> -->
@@ -25,11 +24,11 @@
     <!-- <meta property="og:image:height" content="630" /> -->
 
     <!-- Twitter -->
-    <!-- <meta name="twitter:card" content="summary_large_image" /> -->
-    <!-- <meta name="twitter:site" content="@labenflujo" /> -->
-    <!-- <meta name="twitter:creator" content="@labenflujo" /> -->
-    <!-- <meta name="twitter:url" content="https://enflujo.com" /> -->
-    <!-- <meta name="twitter:title" content="Titulo ..." /> -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:site" content="@labenflujo" />
+    <meta name="twitter:creator" content="@labenflujo" />
+    <meta name="twitter:url" content="https://unmensajeparagabo.enflujo.com" />
+    <meta name="twitter:title" content="Un mensaje para Gabo" />
     <!-- <meta name="twitter:description" content="Descripción ..." /> -->
     <!-- <meta name="twitter:image" content="https://xxxxxx.jpg" /> -->
     <!-- <meta name="twitter:image:alt" content="Texto que describe la imagen" /> -->
@@ -44,14 +43,15 @@
       </div>
     </div>
 
-    <form id="formulario">
-      <textarea id="mensaje" placeholder="Escribe tu mensaje para Gabo"></textarea>
-
-      <div id="infoFormulario">
-        <div id="contador">0 / 500</div>
-        <button type="submit" id="enviar">Enviar mensaje</button>
-      </div>
-    </form>
+    <main id="contenedorPrincipal">
+      <form id="formulario">
+        <textarea id="mensaje" placeholder="Escribe tu mensaje para Gabo"></textarea>
+        <div id="infoFormulario">
+          <div id="contador">0 / 500</div>
+          <button type="submit" id="enviar" disabled>Enviar mensaje</button>
+        </div>
+      </form>
+    </main>
 
     <div id="estigia"></div>
     <script type="module" src="/src/programa.ts"></script>

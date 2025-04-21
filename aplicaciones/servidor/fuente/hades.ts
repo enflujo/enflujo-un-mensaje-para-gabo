@@ -1,11 +1,38 @@
 import Fastify, { FastifyInstance, RouteShorthandOptions } from 'fastify';
-import websocket from '@fastify/websocket';
+import websocket, { type WebSocket } from '@fastify/websocket';
 import os from 'os';
 import fastifyCors from '@fastify/cors';
 import BaseDeDatos from 'better-sqlite3';
 
+type idsPantallas = 'pantalla1' | 'pantalla2' | 'pantalla3' | 'pantalla4';
+interface Pantalla {
+  conectada: boolean;
+  mensajes: string[];
+  conexion: WebSocket | null;
+}
+
 const aplicacion: FastifyInstance = Fastify({});
-const mensajesParaGabo = new BaseDeDatos('mensajes.db');
+const mensajesParaGabo = new BaseDeDatos('./mensajes.db');
+
+// Crear la tabla si no existe
+mensajesParaGabo.exec(`
+  CREATE TABLE IF NOT EXISTS mensajes (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    mensaje TEXT NOT NULL,
+    ip TEXT,
+    dispositivo TEXT,
+    idioma TEXT,
+    fecha TEXT
+  )
+`);
+
+const pantallas: { [llave: string]: Pantalla } = {
+  pantalla1: { conectada: false, mensajes: [], conexion: null },
+  pantalla2: { conectada: false, mensajes: [], conexion: null },
+  pantalla3: { conectada: false, mensajes: [], conexion: null },
+  pantalla4: { conectada: false, mensajes: [], conexion: null },
+};
+let ultimaPantallaConectada: idsPantallas | null = null;
 
 aplicacion.register(fastifyCors, {
   origin: '*', // Esto permite conexiones desde cualquier origen. Puedes restringirlo si lo deseas.
@@ -24,16 +51,41 @@ aplicacion.register(async function (fastify) {
     // Obtener información del encabezado
     const ip = peticion.ip; // IP del cliente
     const dispositivo = peticion.headers['user-agent'];
-    const idioma = peticion.headers['accept-language'];
 
-    console.log('IP:', ip);
+    // Verificar si el cliente es ESP32 que usa "TinyWebsockets Client", de lo contrario cerrar la conexión.
+    if (!dispositivo || (dispositivo && dispositivo !== 'TinyWebsockets Client')) {
+      console.log('El cliente no es TinyWebsockets Client');
+      conexion.close();
+      return;
+    }
+
+    console.log('IP de la ESP32:', ip);
     console.log('Dispositivo:', dispositivo);
-    console.log('Idioma:', idioma);
 
-    conexion.send('https://unmensajeparagabo.enflujo.com');
+    // conexion.send('https://unmensajeparagabo.enflujo.com');
 
-    conexion.on('message', (msg) => {
-      console.log('Mensaje recibido del cliente:', msg.toString());
+    conexion.on('message', (carga) => {
+      console.log('Mensaje recibido del cliente:', carga.toString());
+      try {
+        const datos = JSON.parse(carga.toString()) as { tipo: string; mensaje: string };
+        const { tipo, mensaje } = datos;
+        console.log('Mensaje procesado:', mensaje, tipo);
+
+        if (tipo === 'id') {
+          // Si el cliente envía un ID, se registra la pantalla como conectada
+          const pantalla = mensaje as idsPantallas;
+          if (pantallas[pantalla]) {
+            pantallas[pantalla].conectada = true;
+            pantallas[pantalla].conexion = conexion;
+            ultimaPantallaConectada = pantalla;
+            console.log(`${mensaje} conectada`);
+          } else {
+            console.log(`${mensaje} no válida`);
+          }
+        }
+      } catch (error) {
+        console.error('Error al procesar el mensaje:', error);
+      }
     });
 
     conexion.on('close', () => {
@@ -42,8 +94,13 @@ aplicacion.register(async function (fastify) {
   });
 });
 
-aplicacion.post('/mensaje', async (peticion) => {
-  const { mensaje } = peticion.body as { mensaje: string };
+aplicacion.post('/mensaje', async (peticion, respuesta) => {
+  const { mensaje } = peticion.body as { mensaje?: string };
+
+  if (!mensaje || mensaje.trim() === '') {
+    return respuesta.status(400).send({ error: 'El mensaje está vacío o no fue enviado.' });
+  }
+
   const ip = peticion.ip; // IP del cliente
   const dispositivo = peticion.headers['user-agent'];
   const idioma = peticion.headers['accept-language'];
@@ -54,6 +111,18 @@ aplicacion.post('/mensaje', async (peticion) => {
     'INSERT INTO mensajes (mensaje, ip, dispositivo, idioma, fecha) VALUES (?, ?, ?, ?, ?)'
   );
   consulta.run(mensaje, ip, dispositivo, idioma, fecha);
+
+  if (ultimaPantallaConectada) {
+    const pantalla = pantallas[ultimaPantallaConectada];
+    if (pantalla.conectada && pantalla.conexion) {
+      pantalla.conexion.send(mensaje);
+      console.log(`Mensaje enviado a ${ultimaPantallaConectada}:`, mensaje);
+    } else {
+      console.log(`La pantalla ${ultimaPantallaConectada} no está conectada.`);
+    }
+  } else {
+    console.log('No hay pantallas conectadas.');
+  }
 
   return { message: 'Mensaje enviado a Gabo' };
 });
