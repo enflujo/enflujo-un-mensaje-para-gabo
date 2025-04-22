@@ -33,6 +33,8 @@ const pantallas: { [llave: string]: Pantalla } = {
   pantalla4: { conectada: false, mensajes: [], conexion: null },
 };
 let ultimaPantallaConectada: idsPantallas | null = null;
+let indicePantallaActual = 0;
+const nombresPantallas: idsPantallas[] = ['pantalla1', 'pantalla2', 'pantalla3', 'pantalla4'];
 
 aplicacion.register(fastifyCors, {
   origin: '*', // Esto permite conexiones desde cualquier origen. Puedes restringirlo si lo deseas.
@@ -90,9 +92,20 @@ aplicacion.register(async function (fastify) {
 
     conexion.on('close', () => {
       console.log('Cliente desconectado');
+
+      // Buscar qué pantalla estaba usando esta conexión y limpiarla
+      for (const [nombrePantalla, pantalla] of Object.entries(pantallas)) {
+        if (pantalla.conexion === conexion) {
+          pantalla.conectada = false;
+          pantalla.conexion = null;
+          console.log(`Desconectada ${nombrePantalla}`);
+        }
+      }
     });
   });
 });
+
+
 
 aplicacion.post('/mensaje', async (peticion, respuesta) => {
   const { mensaje } = peticion.body as { mensaje?: string };
@@ -112,16 +125,39 @@ aplicacion.post('/mensaje', async (peticion, respuesta) => {
   );
   consulta.run(mensaje, ip, dispositivo, idioma, fecha);
 
-  if (ultimaPantallaConectada) {
-    const pantalla = pantallas[ultimaPantallaConectada];
+  let mensajeEnviado = false;
+  let intentos = 0;
+
+  // if (ultimaPantallaConectada) {
+  //   const pantalla = pantallas[ultimaPantallaConectada];
+  //   if (pantalla.conectada && pantalla.conexion) {
+  //     pantalla.conexion.send(mensaje);
+  //     console.log(`Mensaje enviado a ${ultimaPantallaConectada}:`, mensaje);
+  //   } else {
+  //     console.log(`La pantalla ${ultimaPantallaConectada} no está conectada.`);
+  //   }
+  // } else {
+  //   console.log('No hay pantallas conectadas.');
+  // }
+
+  while (!mensajeEnviado && intentos < nombresPantallas.length) {
+    const nombrePantalla = nombresPantallas[indicePantallaActual];
+    const pantalla = pantallas[nombrePantalla];
+  
     if (pantalla.conectada && pantalla.conexion) {
       pantalla.conexion.send(mensaje);
-      console.log(`Mensaje enviado a ${ultimaPantallaConectada}:`, mensaje);
+      console.log(`Mensaje enviado a ${nombrePantalla}:`, mensaje);
+      mensajeEnviado = true;
     } else {
-      console.log(`La pantalla ${ultimaPantallaConectada} no está conectada.`);
+      console.log(`Pantalla ${nombrePantalla} no conectada. Se intenta con la siguiente.`);
     }
-  } else {
-    console.log('No hay pantallas conectadas.');
+  
+    indicePantallaActual = (indicePantallaActual + 1) % nombresPantallas.length;
+    intentos++;
+  }
+
+  if (!mensajeEnviado) {
+    console.log('No hay pantallas conectadas disponibles para recibir el mensaje.');
   }
 
   return { message: 'Mensaje enviado a Gabo' };
